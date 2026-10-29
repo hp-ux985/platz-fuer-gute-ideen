@@ -5,13 +5,15 @@ Vorschau und die Preisbeispiele dienen nur der Illustration.
 
 - Alle Beispielanzeigen und Preise sind als fiktive Demo bzw. unbestätigte
   Testannahmen gekennzeichnet.
-- Es gibt keine echten Buchungen, Zahlungen, Reservierungen, Anzeigen-
-  veröffentlichung oder Einnahmen.
+- Es gibt keine echten Buchungen, Zahlungen, Reservierungen,
+  Anzeigenveröffentlichung oder Einnahmen.
 - Das Formular sendet oder speichert keine Eingaben. Die Bildvorschau bleibt
   lokal im Browser.
+- Vorschau- und Reset-Schaltflächen bleiben bei deaktiviertem JavaScript
+  inaktiv; es gibt kein HTML-Formular, das Eingaben als GET-Anfrage übermittelt.
 - Keine Besucherzahlen, Reichweiten oder Kundenerfolge werden behauptet.
 
-Öffentliche Vorschauseite: `site/index.html`.
+Öffentliche Vorschauseite: https://hp-ux985.github.io/platz-fuer-gute-ideen/
 
 ## Dateien
 

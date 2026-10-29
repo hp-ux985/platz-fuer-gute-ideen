@@ -109,6 +109,9 @@ h2 { margin-bottom: 0; font-size: clamp(2.4rem, 5vw, 4rem); line-height: 1.12; }
 .quote-box strong { color: var(--accent); font-family: var(--serif); font-size: 1.8rem; }
 .quote-box small { color: var(--muted); font-size: .7rem; }
 #ad-draft-form button { border: 0; cursor: pointer; font: inherit; }
+#ad-draft-form button:disabled { cursor: not-allowed; opacity: .58; }
+#ad-draft-form .reset-button { margin-left: .5rem; padding: .75rem; border: 1px solid var(--line); color: var(--ink); background: white; font-size: .78rem; }
+.no-script-notice { margin: .8rem 0 0; padding: .8rem; border: 1px solid #bcb8ed; background: #f7f6ff; font-size: .78rem; }
 .form-message { min-height: 1.5em; margin: .7rem 0 0; color: #8c2f25; font-size: .78rem; }
 .form-message[data-kind="success"] { color: var(--green); }
 .preview-panel { position: sticky; top: 1rem; padding: 1.25rem; border: 1px solid var(--line); background: #eeedf9; }

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Lokale MVP-Demo für kleine, transparent gekennzeichnete Werbeflächen.">
+  <meta name="description" content="Öffentliche Konzept-Demo mit lokaler Vorschau für kleine, transparent gekennzeichnete Werbeflächen.">
   <title>Platz für Gute Ideen – Werbeflächen-Konzept</title>
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -11,7 +11,7 @@
   <a class="skip-link" href="#inhalt">Zum Inhalt springen</a>
   <div class="demo-banner">
     <span>Konzept-Demo · keine echte Werbeplattform</span>
-    <span>Keine Buchung, Zahlung oder Veröffentlichung möglich</span>
+    <span>Keine Anzeigenfreischaltung, Buchung oder Zahlung möglich</span>
   </div>
 
   <header class="site-header">
@@ -101,7 +101,7 @@
         <p>Wähle einen Musterplatz und Zeitraum. Der Gesamtpreis ist eine Testannahme; diese Demo nimmt keine Bestellung an.</p>
       </div>
       <div class="booking-grid">
-        <form id="ad-draft-form" novalidate>
+        <div id="ad-draft-form">
           <fieldset>
             <legend>1 · Musterfläche und Laufzeit</legend>
             <label for="slot">Werbefläche</label>
@@ -143,10 +143,14 @@
               <strong id="quote-total">Noch nicht berechnet</strong>
               <small>Keine Zahlung, Reservierung oder verbindliche Bestellung.</small>
             </div>
-            <button class="button" type="submit">Lokale Vorschau erstellen</button>
+            <button class="button" id="create-preview" type="button" disabled>Lokale Vorschau erstellen</button>
+            <button class="reset-button" id="reset-draft" type="button" disabled>Entwurf zurücksetzen</button>
             <p id="form-message" class="form-message" role="status" aria-live="polite"></p>
           </fieldset>
-        </form>
+        </div>
+        <noscript>
+          <p class="no-script-notice">Die lokale Vorschau benötigt JavaScript. Ohne JavaScript bleiben die Vorschau-Schaltflächen deaktiviert; deine Eingaben werden nicht übermittelt.</p>
+        </noscript>
 
         <aside class="preview-panel" aria-labelledby="preview-heading">
           <div class="preview-heading">
@@ -210,7 +214,7 @@
         <h2>Erst prüfen.<br>Dann entscheiden.</h2>
       </div>
       <div>
-        <p>Das ist eine lokale Konzeptseite. Es gibt keine echte Werbefläche, Registrierung, Kontaktaufnahme, Buchung oder Zahlung.</p>
+        <p>Das ist eine öffentlich erreichbare Konzept-Demo. Es gibt keine echte Werbefläche, Registrierung, Kontaktaufnahme, Buchung oder Zahlung.</p>
         <p>Vor einem realen Start müssten unter anderem Preis, verfügbare Fläche, Laufzeit, Moderation, Impressum, Datenschutz, Steuerfragen und Zahlungsanbieter geklärt werden.</p>
         <span class="button button-disabled" aria-disabled="true">Demo – keine Buchung möglich</span>
       </div>
@@ -220,7 +224,7 @@
   <footer>
     <a class="footer-brand" href="#start">Platz für Gute Ideen <small>FIKTIVES WERBEFLÄCHEN-KONZEPT</small></a>
     <p>Nur Demo. Keine echten Anzeigen, Kunden, Buchungen, Einnahmen oder Werbeversprechen.</p>
-    <p>[Anbieterkennzeichnung vor Veröffentlichung prüfen] <span>Keine Zahlung integriert</span></p>
+    <p>[Anbieterkennzeichnung vor kommerziellem Betrieb fachlich prüfen] <span>Keine Zahlung integriert</span></p>
   </footer>
   <script src="booking-demo.js" defer></script>
 </body>

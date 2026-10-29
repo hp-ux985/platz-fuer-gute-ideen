@@ -11,11 +11,16 @@
   const slot = document.getElementById("slot");
   const duration = document.getElementById("duration");
   const imageInput = document.getElementById("ad-image");
+  const previewButton = document.getElementById("create-preview");
+  const resetButton = document.getElementById("reset-draft");
   const message = document.getElementById("form-message");
   const quote = document.getElementById("quote-total");
   const image = document.getElementById("preview-image");
   const imageWrap = document.getElementById("preview-image-wrap");
   let imageObjectUrl = null;
+  let imageValidationToken = 0;
+  let imageValidationPending = false;
+  let imageValidationPassed = false;
 
   function setMessage(text, kind = "error") {
     message.textContent = text;
@@ -79,8 +84,11 @@
   slot.addEventListener("change", updateQuote);
   duration.addEventListener("change", updateQuote);
 
-  imageInput.addEventListener("change", () => {
+  imageInput.addEventListener("change", async () => {
+    const token = ++imageValidationToken;
     const file = imageInput.files?.[0];
+    imageValidationPending = false;
+    imageValidationPassed = false;
     if (imageObjectUrl) {
       URL.revokeObjectURL(imageObjectUrl);
       imageObjectUrl = null;
@@ -98,14 +106,33 @@
       setMessage("Das Bild darf höchstens 1 MB groß sein.");
       return;
     }
-    imageObjectUrl = URL.createObjectURL(file);
-    image.src = imageObjectUrl;
-    imageWrap.hidden = false;
-    setMessage("");
+    imageValidationPending = true;
+    setMessage("Bild wird lokal geprüft …", "success");
+    const objectUrl = URL.createObjectURL(file);
+    try {
+      const bitmap = await createImageBitmap(file);
+      bitmap.close();
+      if (token !== imageValidationToken || imageInput.files?.[0] !== file) {
+        URL.revokeObjectURL(objectUrl);
+        return;
+      }
+      imageObjectUrl = objectUrl;
+      image.src = objectUrl;
+      imageWrap.hidden = false;
+      imageValidationPassed = true;
+      setMessage("");
+    } catch {
+      URL.revokeObjectURL(objectUrl);
+      if (token === imageValidationToken && imageInput.files?.[0] === file) {
+        imageInput.value = "";
+        setMessage("Die Datei enthält kein lesbares Bild im angegebenen Format.");
+      }
+    } finally {
+      if (token === imageValidationToken) imageValidationPending = false;
+    }
   });
 
-  form.addEventListener("submit", (event) => {
-    event.preventDefault();
+  previewButton.addEventListener("click", () => {
     updateQuote();
     const title = document.getElementById("ad-title").value.trim();
     const copy = document.getElementById("ad-copy").value.trim();
@@ -123,13 +150,18 @@
       setMessage("Bitte eine öffentliche HTTP(S)-Zieladresse ohne Zugangsdaten eingeben.");
       return;
     }
+    if (imageValidationPending) {
+      setMessage("Bitte warte, bis die lokale Bildprüfung abgeschlossen ist.");
+      return;
+    }
     if (!document.getElementById("policy-accept").checked) {
       setMessage("Bitte die Werberichtlinien bestätigen, um die lokale Vorschau zu erstellen.");
       return;
     }
     if (
       file &&
-      (!["image/png", "image/jpeg", "image/webp"].includes(file.type) ||
+      (!imageValidationPassed ||
+        !["image/png", "image/jpeg", "image/webp"].includes(file.type) ||
         file.size > 1_000_000)
     ) {
       setMessage("Das Bild muss PNG, JPEG oder WebP sein und darf höchstens 1 MB groß sein.");
@@ -149,6 +181,36 @@
       block: "nearest",
     });
   });
+
+  resetButton.addEventListener("click", () => {
+    imageValidationToken += 1;
+    imageValidationPending = false;
+    imageValidationPassed = false;
+    if (imageObjectUrl) {
+      URL.revokeObjectURL(imageObjectUrl);
+      imageObjectUrl = null;
+    }
+    form.querySelectorAll("input, select, textarea").forEach((field) => {
+      if (field.type === "checkbox") {
+        field.checked = false;
+      } else {
+        field.value = "";
+      }
+    });
+    image.removeAttribute("src");
+    imageWrap.hidden = true;
+    document.getElementById("preview-title").textContent = "Dein Titel erscheint hier";
+    document.getElementById("preview-copy").textContent =
+      "Dein Anzeigentext erscheint hier.";
+    document.getElementById("preview-target").textContent =
+      "Zieladresse noch nicht eingegeben";
+    quote.textContent = "Noch nicht berechnet";
+    setMessage("");
+    slot.focus();
+  });
+
+  previewButton.disabled = false;
+  resetButton.disabled = false;
 
   window.addEventListener("pagehide", () => {
     if (imageObjectUrl) URL.revokeObjectURL(imageObjectUrl);
