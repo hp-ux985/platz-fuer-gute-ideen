@@ -11,7 +11,7 @@ const html = fs.readFileSync(path.join(root, "site/index.html"), "utf8");
 class Element {
   constructor(type = "text") {
     this.type = type;
-    this.value = "";
+    this._value = "";
     this.checked = false;
     this.files = [];
     this.disabled = true;
@@ -19,6 +19,15 @@ class Element {
     this.textContent = "";
     this.dataset = {};
     this.listeners = new Map();
+  }
+
+  get value() {
+    return this._value;
+  }
+
+  set value(value) {
+    this._value = value;
+    if (this.type === "file" && value === "") this.files = [];
   }
 
   addEventListener(name, callback) {
