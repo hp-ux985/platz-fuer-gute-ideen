@@ -117,6 +117,7 @@ test("valid data updates the preview as text without submitting", async () => {
   assert.equal(elements.get("preview-copy").textContent, "Nur Vorschau");
   assert.equal(elements.get("preview-target").textContent, "https://example.com/angebot");
   assert.match(elements.get("form-message").textContent, /nichts gesendet, gespeichert oder gebucht/);
+  assert.equal(elements.get("form-message").dataset.kind, "success");
   assert.equal(elements.get("ad-preview").scrolled, true);
 });
 
@@ -192,6 +193,37 @@ test("reset clears preview and input state and revokes temporary image URLs", as
   assert.equal(elements.get("slot").focused, true);
 });
 
+test("validation feedback is explicit and leaves the previous preview unchanged", async (t) => {
+  const cases = [
+    ["missing slot", (e) => { e.get("slot").value = ""; }, /g?ltige Musterfl?che und Laufzeit/],
+    ["too-long title", (e) => { e.get("ad-title").value = "x".repeat(61); }, /Titel \(1?60 Zeichen\)/],
+    ["invalid URL", (e) => { e.get("target-url").value = "javascript:alert(1)"; }, /?ffentliche HTTP\(S\)-Zieladresse/],
+    ["policy not accepted", (e) => { e.get("policy-accept").checked = false; }, /Werberichtlinien best?tigen/],
+  ];
+  for (const [label, change, expectedMessage] of cases) {
+    await t.test(label, async () => {
+      const { elements } = makePage();
+      setValidFields(elements);
+      elements.get("preview-title").textContent = "Vorherige Vorschau";
+      change(elements);
+      await elements.get("create-preview").emit("click");
+      assert.match(elements.get("form-message").textContent, expectedMessage);
+      assert.equal(elements.get("form-message").dataset.kind, "error");
+      assert.equal(elements.get("preview-title").textContent, "Vorherige Vorschau");
+    });
+  }
+});
+
+test("clearing a price selection removes a stale quote", async () => {
+  const { elements } = makePage();
+  elements.get("slot").value = "klein";
+  elements.get("duration").value = "7";
+  await elements.get("slot").emit("change");
+  assert.match(elements.get("quote-total").textContent, /3,00/);
+  elements.get("slot").value = "";
+  await elements.get("slot").emit("change");
+  assert.equal(elements.get("quote-total").textContent, "Noch nicht berechnet");
+});
 test("static page has no outbound submission or persistent browser storage code", () => {
   assert.doesNotMatch(html, /<form\b/i);
   assert.doesNotMatch(script, /\b(fetch|XMLHttpRequest|sendBeacon|localStorage|sessionStorage)\b/);
