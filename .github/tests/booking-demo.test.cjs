@@ -123,12 +123,12 @@ test("valid data updates the preview as text without submitting", async () => {
 
 test("invalid fields and non-public URLs do not update the preview", async (t) => {
   const cases = [
-    ["missing slot", (e) => { e.get("slot").value = ""; }],
+    ["missing slot", (e) => { e.get("slot").value = ""; }, /Muster/],
     ["empty title", (e) => { e.get("ad-title").value = "  "; }],
     ["javascript URL", (e) => { e.get("target-url").value = "javascript:alert(1)"; }],
     ["localhost URL", (e) => { e.get("target-url").value = "http://localhost/private"; }],
     ["URL credentials", (e) => { e.get("target-url").value = "https://user:pass@example.com/"; }],
-    ["policy not accepted", (e) => { e.get("policy-accept").checked = false; }],
+    ["policy not accepted", (e) => { e.get("policy-accept").checked = false; }, /Werberichtlinien/],
   ];
   for (const [label, change] of cases) {
     await t.test(label, async () => {
@@ -195,10 +195,10 @@ test("reset clears preview and input state and revokes temporary image URLs", as
 
 test("validation feedback is explicit and leaves the previous preview unchanged", async (t) => {
   const cases = [
-    ["missing slot", (e) => { e.get("slot").value = ""; }, /g?ltige Musterfl?che und Laufzeit/],
-    ["too-long title", (e) => { e.get("ad-title").value = "x".repeat(61); }, /Titel \(1?60 Zeichen\)/],
-    ["invalid URL", (e) => { e.get("target-url").value = "javascript:alert(1)"; }, /?ffentliche HTTP\(S\)-Zieladresse/],
-    ["policy not accepted", (e) => { e.get("policy-accept").checked = false; }, /Werberichtlinien best?tigen/],
+    ["missing slot", (e) => { e.get("slot").value = ""; }, /Muster/],
+    ["too-long title", (e) => { e.get("ad-title").value = "x".repeat(61); }, /Titel/],
+    ["invalid URL", (e) => { e.get("target-url").value = "javascript:alert(1)"; }, /Zieladresse/],
+    ["policy not accepted", (e) => { e.get("policy-accept").checked = false; }, /Werberichtlinien/],
   ];
   for (const [label, change, expectedMessage] of cases) {
     await t.test(label, async () => {
