@@ -2,20 +2,47 @@ name: Deploy static site to GitHub Pages
 
 on:
   push:
+    branches: ["**"]
+  pull_request:
     branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
-  group: pages
+  group: static-site-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  validate:
+    name: Static site checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Validate HTML structure and local-only form behavior
+        run: python -m unittest discover -s .github/tests -p "test_*.py" -v
+      - name: Check JavaScript syntax
+        run: node --check site/booking-demo.js
+      - name: Test local demo behavior
+        run: node --test .github/tests/booking-demo.test.cjs
+
   deploy:
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    needs: validate
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
